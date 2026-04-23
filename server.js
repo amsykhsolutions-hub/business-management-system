@@ -12,38 +12,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// DB connect (SAFE WRAP)
-try {
-  connectDB();
-} catch (err) {
+// DB connect
+connectDB().catch(err => {
   console.log("DB connection failed:", err.message);
-}
+});
 
-// routes (SAFE LOAD)
-try {
-  app.use("/api/auth", require("./routes/authRoutes"));
-} catch (err) {
-  console.log("Auth routes error:", err.message);
-}
+// routes
+app.use("/api/auth", require("./routes/authRoutes"));
 
 // test route
 app.get("/", (req, res) => {
   res.status(200).send("API is running...");
 });
 
-// protected route (SAFE LOAD)
-try {
-  const authMiddleware = require("./middleware/authMiddleware");
+// protected route
+const authMiddleware = require("./middleware/authMiddleware");
 
-  app.get("/api/protected", authMiddleware, (req, res) => {
-    res.json({
-      message: "Protected route accessed",
-      user: req.user
-    });
+app.get("/api/protected", authMiddleware, (req, res) => {
+  res.json({
+    message: "Protected route accessed",
+    user: req.user
   });
-} catch (err) {
-  console.log("Auth middleware error:", err.message);
-}
+});
 
 // DB log
 mongoose.connection.on("connected", () => {
