@@ -1,3 +1,4 @@
+const { sendSuccess, sendError } = require("../utils/response");
 const authService = require("../services/authService");
 
 // REGISTER CONTROLLER
@@ -7,17 +8,10 @@ exports.registerUser = async (req, res) => {
 
     const user = await authService.registerUser(name, email, password);
 
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user
-    });
+    return sendSuccess(res, user, "User registered successfully");
 
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message
-    });
+    return sendError(res, error.message, 400);
   }
 };
 
@@ -28,17 +22,9 @@ exports.login = async (req, res) => {
 
     const result = await authService.loginUser(email, password);
 
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      user: result.user,
-      token: result.token
-    });
+    return sendSuccess(res, result, "Login successful");
 
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: error.message
-    });
+    return sendError(res, error.message, 401);
   }
 };
