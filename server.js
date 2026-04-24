@@ -7,7 +7,9 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
 const app = express();
+const adminRoutes = require("./routes/adminRoutes");
 
+app.use("/api/admin", adminRoutes);
 // middleware
 app.use(cors());
 app.use(express.json());

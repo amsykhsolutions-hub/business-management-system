@@ -38,12 +38,15 @@ const loginUser = async (email, password) => {
     }
 
     // generate token
-    const token = generateToken(user);
+    const token = generateToken({
+    _id: user._id,
+    email: user.email,
+    role: user.role
+});
 
-    return {
-        user,
-        token
-    };
+});
+
+module.exports = router;
 };
 
 module.exports = {
