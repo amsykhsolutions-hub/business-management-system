@@ -42,14 +42,15 @@ const loginUser = async (email, password) => {
     _id: user._id,
     email: user.email,
     role: user.role
-});
+  });
 
-});
-
-module.exports = router;
+  return {
+    user,
+    token
+  };
 };
 
 module.exports = {
-    registerUser,
-    loginUser
+  registerUser,
+  loginUser
 };
