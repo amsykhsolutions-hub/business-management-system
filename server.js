@@ -11,9 +11,6 @@ const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 
-app.use("/api/orders", orderRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/products", productRoutes);
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -25,7 +22,9 @@ connectDB().catch(err => {
 
 // routes
 app.use("/api/auth", require("./routes/authRoutes"));
-
+app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/products", productRoutes);
 // test route
 app.get("/", (req, res) => {
   res.status(200).send("API is running...");
