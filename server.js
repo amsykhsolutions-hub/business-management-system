@@ -8,8 +8,9 @@ const connectDB = require("./config/db");
 
 const app = express();
 const adminRoutes = require("./routes/adminRoutes");
-
+const productRoutes = require("./routes/productRoutes");
 app.use("/api/admin", adminRoutes);
+app.use("/api/products", productRoutes);
 // middleware
 app.use(cors());
 app.use(express.json());
