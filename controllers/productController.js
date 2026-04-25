@@ -40,3 +40,23 @@ exports.getProductById = async (req, res) => {
     sendError(res, err.message);
   }
 };
+exports.updateProduct = async (req, res) => {
+  try {
+    const product = await productService.updateProduct(
+      req.params.id,
+      req.body
+    );
+
+    sendSuccess(res, product, "Product updated");
+  } catch (err) {
+    sendError(res, err.message);
+  }
+};
+exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await productService.deleteProduct(req.params.id);
+    sendSuccess(res, product, "Product deleted");
+  } catch (err) {
+    sendError(res, err.message);
+  }
+};
