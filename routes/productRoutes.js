@@ -7,7 +7,7 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 // PUBLIC
 router.get("/", productController.getAllProducts);
-
+router.get("/:id", productController.getProductById);
 // ADMIN ONLY
 router.post(
   "/",

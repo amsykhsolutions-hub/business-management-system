@@ -1,9 +1,19 @@
 const productService = require("../services/productService");
 const { sendSuccess, sendError } = require("../utils/response");
 
-// CREATE
+// CREATE PRODUCT (ADMIN ONLY)
 exports.createProduct = async (req, res) => {
   try {
+    const { name, price } = req.body;
+
+    if (!name || !price) {
+      return sendError(res, "Name and price are required");
+    }
+
+    if (price <= 0) {
+      return sendError(res, "Price must be greater than 0");
+    }
+
     const product = await productService.createProduct(req.body, req.user.id);
     sendSuccess(res, product, "Product created");
   } catch (err) {
@@ -11,11 +21,21 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// GET ALL
+// GET ALL PRODUCTS (PUBLIC)
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await productService.getAllProducts();
     sendSuccess(res, products);
+  } catch (err) {
+    sendError(res, err.message);
+  }
+};
+
+// GET SINGLE PRODUCT
+exports.getProductById = async (req, res) => {
+  try {
+    const product = await productService.getProductById(req.params.id);
+    sendSuccess(res, product);
   } catch (err) {
     sendError(res, err.message);
   }
