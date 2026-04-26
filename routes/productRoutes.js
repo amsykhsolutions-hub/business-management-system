@@ -2,30 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const productController = require("../controllers/productController");
-const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
+const { protect } = require("../middleware/authMiddleware");
+const role = require("../middleware/roleMiddleware");
 
-// PUBLIC
-router.get("/", productController.getAllProducts);
-router.get("/:id", productController.getProductById);
-// ADMIN ONLY
-router.post(
-  "/",
-  authMiddleware,
-  roleMiddleware("admin"),
-  productController.createProduct
-);
-router.put(
-  "/:id",
-  authMiddleware,
-  roleMiddleware("admin"),
-  productController.updateProduct
-);
-router.delete(
-  "/:id",
-  authMiddleware,
-  roleMiddleware("admin"),
-  productController.deleteProduct
-);
+// CREATE PRODUCT (admin only)
+router.post("/", protect, role(["admin"]), productController.createProduct);
+
+// GET ALL PRODUCTS
+router.get("/", productController.getProducts);
 
 module.exports = router;
