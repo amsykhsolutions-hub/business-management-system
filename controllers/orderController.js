@@ -1,4 +1,5 @@
-const orderService = require("../services/orderService");
+const orderController = require("../controllers/orderController");
+console.log(orderController); // 👈 ADD THISconst orderService = require("../services/orderService");
 
 // CREATE ORDER
 exports.createOrder = async (req, res) => {
