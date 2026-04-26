@@ -2,22 +2,37 @@ const express = require("express");
 const router = express.Router();
 
 const productController = require("../controllers/productController");
-const { protect } = require("../middleware/authMiddleware");
-const role = require("../middleware/roleMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
-// CREATE PRODUCT (admin)
-router.post("/", protect, role(["admin"]), productController.createProduct);
+// CREATE PRODUCT (admin only)
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  productController.createProduct
+);
 
 // GET ALL PRODUCTS
 router.get("/", productController.getAllProducts);
 
 // GET SINGLE PRODUCT
-router.get("/:id", productController.getProduct);
+router.get("/:id", productController.getSingleProduct);
 
-// UPDATE PRODUCT
-router.put("/:id", protect, role(["admin"]), productController.updateProduct);
+// UPDATE PRODUCT (admin)
+router.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  productController.updateProduct
+);
 
-// DELETE PRODUCT
-router.delete("/:id", protect, role(["admin"]), productController.deleteProduct);
+// DELETE PRODUCT (admin)
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  productController.deleteProduct
+);
 
 module.exports = router;
