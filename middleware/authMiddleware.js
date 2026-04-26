@@ -1,35 +1,15 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const express = require("express");
+const router = express.Router();
 
-const protect = async (req, res, next) => {
-  let token;
+const { protect } = require("../middleware/authMiddleware");
+const role = require("../middleware/roleMiddleware");
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
+// ADMIN ONLY TEST
+router.get("/test", protect, role(["admin"]), (req, res) => {
+  res.json({
+    success: true,
+    message: "Admin access granted"
+  });
+});
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      req.user = await User.findById(decoded.id).select("-password");
-
-      next();
-    } catch (err) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized",
-      });
-    }
-  }
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "No token",
-    });
-  }
-};
-
-module.exports = { protect };
+module.exports = router;
