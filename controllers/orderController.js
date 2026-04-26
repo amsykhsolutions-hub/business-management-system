@@ -1,8 +1,7 @@
-const orderController = require("../controllers/orderController");
-console.log(orderController); // 👈 ADD THISconst orderService = require("../services/orderService");
+const orderService = require("../services/orderService");
 
 // CREATE ORDER
-exports.createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     const order = await orderService.createOrder(
       req.body.items,
@@ -21,8 +20,8 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-// GET LOGGED-IN USER ORDERS
-exports.getMyOrders = async (req, res) => {
+// GET MY ORDERS
+const getMyOrders = async (req, res) => {
   try {
     const orders = await orderService.getMyOrders(req.user.id);
 
@@ -37,4 +36,9 @@ exports.getMyOrders = async (req, res) => {
       message: err.message,
     });
   }
+};
+
+module.exports = {
+  createOrder,
+  getMyOrders,
 };
