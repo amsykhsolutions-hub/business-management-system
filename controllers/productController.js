@@ -1,62 +1,115 @@
-const productService = require("../services/productService");
-const { sendSuccess, sendError } = require("../utils/response");
+const Product = require("../models/Product");
 
-// CREATE PRODUCT (ADMIN ONLY)
+// CREATE PRODUCT
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price } = req.body;
+    const product = await Product.create({
+      ...req.body,
+      createdBy: req.user.id,
+    });
 
-    if (!name || !price) {
-      return sendError(res, "Name and price are required");
-    }
-
-    if (price <= 0) {
-      return sendError(res, "Price must be greater than 0");
-    }
-
-    const product = await productService.createProduct(req.body, req.user.id);
-    sendSuccess(res, product, "Product created");
+    res.status(201).json({
+      success: true,
+      data: product,
+    });
   } catch (err) {
-    sendError(res, err.message);
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-// GET ALL PRODUCTS (PUBLIC)
-exports.getAllProducts = async (req, res) => {
+// GET ALL PRODUCTS
+exports.getProducts = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
-    sendSuccess(res, products);
+    const products = await Product.find();
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
   } catch (err) {
-    sendError(res, err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
 // GET SINGLE PRODUCT
-exports.getProductById = async (req, res) => {
+exports.getProduct = async (req, res) => {
   try {
-    const product = await productService.getProductById(req.params.id);
-    sendSuccess(res, product);
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product,
+    });
   } catch (err) {
-    sendError(res, err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
+
+// UPDATE PRODUCT
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await productService.updateProduct(
+    const product = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body
+      req.body,
+      { new: true }
     );
 
-    sendSuccess(res, product, "Product updated");
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product,
+    });
   } catch (err) {
-    sendError(res, err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
+
+// DELETE PRODUCT
 exports.deleteProduct = async (req, res) => {
   try {
-    const product = await productService.deleteProduct(req.params.id);
-    sendSuccess(res, product, "Product deleted");
+    const product = await Product.findByIdAndDelete(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted",
+    });
   } catch (err) {
-    sendError(res, err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
