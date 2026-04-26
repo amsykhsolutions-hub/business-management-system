@@ -4,6 +4,9 @@ const router = express.Router();
 const orderController = require("../controllers/orderController");
 const { protect } = require("../middleware/authMiddleware");
 
+// DEBUG (remove later)
+console.log("Controller:", orderController);
+
 // Get logged-in user's orders
 router.get("/my-orders", protect, orderController.getMyOrders);
 
