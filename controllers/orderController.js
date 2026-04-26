@@ -1,5 +1,6 @@
 const orderService = require("../services/orderService");
 
+// CREATE ORDER
 exports.createOrder = async (req, res) => {
   try {
     const order = await orderService.createOrder(
@@ -18,6 +19,8 @@ exports.createOrder = async (req, res) => {
     });
   }
 };
+
+// GET LOGGED-IN USER ORDERS
 exports.getMyOrders = async (req, res) => {
   try {
     const orders = await orderService.getMyOrders(req.user.id);
@@ -27,10 +30,10 @@ exports.getMyOrders = async (req, res) => {
       count: orders.length,
       data: orders,
     });
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: err.message,
     });
   }
 };
