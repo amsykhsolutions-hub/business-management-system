@@ -47,7 +47,7 @@ mongoose.connection.on("connected", () => {
 
 // PORT
 const PORT = process.env.PORT || 5000;
-
+console.log("🚀 Reached server.js before listen");
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
