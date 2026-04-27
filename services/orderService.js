@@ -38,7 +38,7 @@ exports.createOrder = async (items, userId) => {
 exports.getMyOrders = async (userId) => {
   const orders = await Order.find({ user: userId })
     .sort({ createdAt: -1 })
-    .populate("products.product", "name price");
+    .populate("items.product", "name price");
 
   return orders;
 };
