@@ -1,29 +1,29 @@
 const Product = require("../models/Product");
 
-// CREATE
+// =========================
+// CREATE PRODUCT
+// =========================
 exports.createProduct = async (data, userId) => {
   return await Product.create({
     ...data,
-    createdBy: userId,
+    user: userId
   });
 };
 
-// GET ALL
-exports.getAllProducts = async () => {
-  return await Product.find();
+// =========================
+// GET ALL PRODUCTS (USER SCOPED)
+// =========================
+exports.getAllProducts = async (userId) => {
+  return await Product.find({ user: userId });
 };
-exports.getProductById = async (id) => {
-  const product = await Product.findById(id);
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
-
-  return product;
-};
-exports.updateProduct = async (id, data) => {
-  const product = await Product.findByIdAndUpdate(id, data, {
-    new: true,
+// =========================
+// GET PRODUCT BY ID (USER SCOPED)
+// =========================
+exports.getProductById = async (id, userId) => {
+  const product = await Product.findOne({
+    _id: id,
+    user: userId
   });
 
   if (!product) {
@@ -32,8 +32,35 @@ exports.updateProduct = async (id, data) => {
 
   return product;
 };
-exports.deleteProduct = async (id) => {
-  const product = await Product.findByIdAndDelete(id);
+
+// =========================
+// UPDATE PRODUCT (USER SCOPED)
+// =========================
+exports.updateProduct = async (id, data, userId) => {
+  const product = await Product.findOneAndUpdate(
+    {
+      _id: id,
+      user: userId
+    },
+    data,
+    { new: true }
+  );
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  return product;
+};
+
+// =========================
+// DELETE PRODUCT (USER SCOPED)
+// =========================
+exports.deleteProduct = async (id, userId) => {
+  const product = await Product.findOneAndDelete({
+    _id: id,
+    user: userId
+  });
 
   if (!product) {
     throw new Error("Product not found");

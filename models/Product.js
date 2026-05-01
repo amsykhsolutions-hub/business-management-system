@@ -13,10 +13,14 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  createdBy: {
+
+  // ✅ FIXED FOR SAAS ISOLATION
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Product", productSchema);

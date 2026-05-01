@@ -23,7 +23,7 @@ exports.createProduct = async (req, res) => {
 // GET ALL PRODUCTS
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
+    const products = await productService.getAllProducts(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -41,7 +41,7 @@ exports.getAllProducts = async (req, res) => {
 // GET SINGLE PRODUCT
 exports.getSingleProduct = async (req, res) => {
   try {
-    const product = await productService.getProductById(req.params.id);
+    const product = await productService.getProductById(req.params.id, req.user.id);
 
     res.status(200).json({
       success: true,
@@ -58,10 +58,7 @@ exports.getSingleProduct = async (req, res) => {
 // UPDATE PRODUCT
 exports.updateProduct = async (req, res) => {
   try {
-    const product = await productService.updateProduct(
-      req.params.id,
-      req.body
-    );
+    const product = await productService.updateProduct(req.params.id, req.body, req.user.id);
 
     res.status(200).json({
       success: true,
@@ -78,7 +75,7 @@ exports.updateProduct = async (req, res) => {
 // DELETE PRODUCT
 exports.deleteProduct = async (req, res) => {
   try {
-    await productService.deleteProduct(req.params.id);
+    await productService.deleteProduct(req.params.id, req.user.id);
 
     res.status(200).json({
       success: true,
