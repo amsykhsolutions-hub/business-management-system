@@ -38,11 +38,15 @@ const orderSchema = new mongoose.Schema(
     },
 
     items: {
-      type: [orderItemSchema],
-      required: true,
-      validate: (items) => items.length > 0,
+  type: [orderItemSchema],
+  required: true,
+  validate: {
+    validator: function (items) {
+      return items.length > 0;
     },
-
+    message: "Order must contain at least one item",
+  },
+},
     totalPrice: {
       type: Number,
       required: true,

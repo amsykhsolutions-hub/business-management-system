@@ -10,7 +10,10 @@ exports.createOrder = async (items, userId) => {
   const orderItems = [];
 
   for (let item of items) {
-    const product = await Product.findById(item.product);
+    const product = await Product.findOne({
+  _id: item.product,
+  user: userId,
+});
 
     if (!product) {
       throw new Error("Product not found");
