@@ -1,5 +1,4 @@
 const productService = require("../services/productService");
-
 // CREATE PRODUCT
 exports.createProduct = async (req, res) => {
   try {

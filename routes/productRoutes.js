@@ -14,7 +14,7 @@ router.post(
 );
 
 // GET ALL PRODUCTS
-router.get("/", productController.getAllProducts);
+router.get("/", authMiddleware, productController.getAllProducts);
 
 // GET SINGLE PRODUCT
 router.get("/:id", productController.getSingleProduct);
