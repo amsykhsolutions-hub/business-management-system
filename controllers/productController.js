@@ -23,6 +23,8 @@ exports.createProduct = async (req, res) => {
 // GET ALL PRODUCTS
 exports.getAllProducts = async (req, res) => {
   try {
+console.log("USER:", req.user);
+console.log("USER ID:", req.user?.id);
     const products = await productService.getAllProducts(req.user.id);
 
     res.status(200).json({
