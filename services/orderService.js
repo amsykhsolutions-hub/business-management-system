@@ -11,36 +11,41 @@ exports.createOrder = async (items, userId) => {
 
   for (let item of items) {
     const product = await Product.findOne({
-  _id: item.product,
-  user: userId,
-});
+      _id: item.product,
+      user: userId,
+    });
 
     if (!product) {
       throw new Error("Product not found");
     }
-if (product.stock < item.quantity) {
-  throw new Error(`${product.name} has only ${product.stock} left`);
-}
-    const itemTotal = product.price * item.quantity;
-    totalPrice += itemTotal;
 
+    const qty = parseInt(item.quantity);
+
+if (!qty || qty <= 0) {
+  throw new Error("Invalid quantity");
+}
+// 🔥 IMPORTANT FIX
+
+    if (product.stock < qty) {
+      throw new Error(`${product.name} has only ${product.stock} left`);
+    }
+
+    // 💰 calculate price
+    totalPrice += product.price * qty;
+
+    // 📦 build order
     orderItems.push({
       product: product._id,
       name: product.name,
       price: product.price,
-      quantity: item.quantity,
+      quantity: qty,
     });
-  }
-// Reduce stock
-for (let item of items) {
-  const product = await Product.findOne({
-    _id: item.product,
-    user: userId,
-  });
 
-  product.stock -= item.quantity;
-  await product.save();
-}
+    // 🔥 REDUCE STOCK HERE (SINGLE SOURCE OF TRUTH)
+    product.stock -= qty;
+    await product.save();
+  }
+
   const order = await Order.create({
     user: userId,
     items: orderItems,
@@ -49,10 +54,5 @@ for (let item of items) {
 
   return order;
 };
-exports.getMyOrders = async (userId) => {
-  const orders = await Order.find({ user: userId })
-    .sort({ createdAt: -1 })
-    .populate("items.product", "name price");
 
-  return orders;
-};
+
