@@ -54,4 +54,6 @@ if (!qty || qty <= 0) {
   return order;
 };
 
-
+exports.getMyOrders = async (userId) => {
+  return await Order.find({ user: userId });
+};
