@@ -19,8 +19,7 @@ exports.createOrder = async (items, userId) => {
       throw new Error("Product not found");
     }
 
-    const qty = parseInt(item.quantity);
-
+const qty = Number(item.quantity);
 if (!qty || qty <= 0) {
   throw new Error("Invalid quantity");
 }
