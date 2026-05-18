@@ -1,40 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const authService = require("../services/authService");
+const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const User = require("../models/User");
-
+const authService = require("../services/authService");
 // ============================
 // REGISTER
 // ============================
-router.post("/register", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required"
-      });
-    }
-
-    const user = await authService.registerUser(name, email, password);
-
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user
-    });
-
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
-
+router.post("/register", authController.registerUser);
 
 // ============================
 // LOGIN
@@ -66,7 +40,6 @@ router.post("/login", async (req, res) => {
     });
   }
 });
-
 
 // ============================
 // GET CURRENT USER (/me)

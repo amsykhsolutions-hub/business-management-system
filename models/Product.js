@@ -5,19 +5,28 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
   price: {
     type: Number,
     required: true,
   },
+
   stock: {
     type: Number,
     default: 0,
   },
 
-  // ✅ FIXED FOR SAAS ISOLATION
+  // OLD SYSTEM (keep for now)
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    required: true,
+  },
+
+  // NEW SAAS SYSTEM
+  business: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Business",
     required: true,
   }
 

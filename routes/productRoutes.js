@@ -3,35 +3,49 @@ const router = express.Router();
 
 const productController = require("../controllers/productController");
 const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
 
-// CREATE PRODUCT (admin only)
+// =========================
+// CREATE PRODUCT
+// =========================
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware(["admin"]),
   productController.createProduct
 );
 
+// =========================
 // GET ALL PRODUCTS
-router.get("/", authMiddleware, productController.getAllProducts);
+// =========================
+router.get(
+  "/",
+  authMiddleware,
+  productController.getAllProducts
+);
 
+// =========================
 // GET SINGLE PRODUCT
-router.get("/:id", productController.getSingleProduct);
+// =========================
+router.get(
+  "/:id",
+  authMiddleware,
+  productController.getSingleProduct
+);
 
-// UPDATE PRODUCT (admin)
+// =========================
+// UPDATE PRODUCT
+// =========================
 router.put(
   "/:id",
   authMiddleware,
-  roleMiddleware(["admin"]),
   productController.updateProduct
 );
 
-// DELETE PRODUCT (admin)
+// =========================
+// DELETE PRODUCT
+// =========================
 router.delete(
   "/:id",
   authMiddleware,
-  roleMiddleware(["admin"]),
   productController.deleteProduct
 );
 

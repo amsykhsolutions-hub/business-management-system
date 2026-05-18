@@ -3,27 +3,30 @@ const Product = require("../models/Product");
 // =========================
 // CREATE PRODUCT
 // =========================
-exports.createProduct = async (data, userId) => {
-  return await Product.create({
-    ...data,
-    user: userId
+exports.createProduct = async (data, userId, businessId) => {
+return await Product.create({
+  ...data,
+  user: userId,
+  business: businessId,
+})
+};
+
+// =========================
+// GET ALL PRODUCTS
+// =========================
+exports.getAllProducts = async (businessId) => {
+  return await Product.find({
+    business: businessId,
   });
 };
 
 // =========================
-// GET ALL PRODUCTS (USER SCOPED)
+// GET SINGLE PRODUCT
 // =========================
-exports.getAllProducts = async (userId) => {
-  return await Product.find({ user: userId });
-};
-
-// =========================
-// GET PRODUCT BY ID (USER SCOPED)
-// =========================
-exports.getProductById = async (id, userId) => {
+exports.getProductById = async (id, businessId) => {
   const product = await Product.findOne({
     _id: id,
-    user: userId
+    business: businessId,
   });
 
   if (!product) {
@@ -34,16 +37,19 @@ exports.getProductById = async (id, userId) => {
 };
 
 // =========================
-// UPDATE PRODUCT (USER SCOPED)
+// UPDATE PRODUCT
 // =========================
-exports.updateProduct = async (id, data, userId) => {
+exports.updateProduct = async (id, data, businessId) => {
   const product = await Product.findOneAndUpdate(
     {
       _id: id,
-      user: userId
+      business: businessId,
     },
     data,
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
 
   if (!product) {
@@ -54,12 +60,12 @@ exports.updateProduct = async (id, data, userId) => {
 };
 
 // =========================
-// DELETE PRODUCT (USER SCOPED)
+// DELETE PRODUCT
 // =========================
-exports.deleteProduct = async (id, userId) => {
+exports.deleteProduct = async (id, businessId) => {
   const product = await Product.findOneAndDelete({
     _id: id,
-    user: userId
+    business: businessId,
   });
 
   if (!product) {

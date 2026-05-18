@@ -26,7 +26,7 @@ const registerUser = async (name, email, password) => {
 // LOGIN SERVICE
 const loginUser = async (email, password) => {
     // find user
-    const user = await User.findOne({ email });
+const user = await User.findOne({ email }).populate("business");
     if (!user) {
         throw new Error("Invalid credentials");
     }
@@ -39,11 +39,11 @@ const loginUser = async (email, password) => {
 
     // generate token
     const token = generateToken({
-    _id: user._id,
-    email: user.email,
-    role: user.role
-  });
-
+  _id: user._id,
+  email: user.email,
+  role: user.role,
+businessId: user.business._id
+});
   return {
     user,
     token
