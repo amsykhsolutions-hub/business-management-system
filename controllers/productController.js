@@ -32,8 +32,10 @@ exports.getAllProducts = async (req, res) => {
   try {
     const businessId = req.user.business._id;
 
-    const products = await productService.getAllProducts(businessId);
-
+const products = await productService.getAllProducts(
+  businessId,
+  req.query
+);
     return res.status(200).json({
       success: true,
       count: products.length,

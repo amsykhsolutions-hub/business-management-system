@@ -14,12 +14,44 @@ return await Product.create({
 // =========================
 // GET ALL PRODUCTS
 // =========================
-exports.getAllProducts = async (businessId) => {
-  return await Product.find({
-    business: businessId,
-  });
-};
+exports.getAllProducts = async (businessId, query) => {
+  const page = Number(query.page) || 1;
 
+  const limit = Number(query.limit) || 10;
+
+  const skip = (page - 1) * limit;
+
+  const search = query.search || "";
+
+  const filter = {
+    business: businessId,
+
+    ...(search && {
+      name: {
+        $regex: search,
+        $options: "i",
+      },
+    }),
+  };
+
+  const products = await Product.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await Product.countDocuments(filter);
+
+  return {
+    products,
+
+    pagination: {
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    },
+  };
+};
 // =========================
 // GET SINGLE PRODUCT
 // =========================
