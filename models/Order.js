@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+// =========================
+// ORDER ITEM SCHEMA
+// =========================
 const orderItemSchema = new mongoose.Schema(
   {
     product: {
@@ -8,14 +11,16 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🔥 Snapshot of product name
     name: {
       type: String,
-      required: true, // snapshot of product name
+      required: true,
     },
 
+    // 🔥 Snapshot of product price
     price: {
       type: Number,
-      required: true, // snapshot of product price at time of order
+      required: true,
     },
 
     quantity: {
@@ -28,8 +33,12 @@ const orderItemSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// =========================
+// ORDER SCHEMA
+// =========================
 const orderSchema = new mongoose.Schema(
   {
+    // 👤 User who placed order
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -37,35 +46,72 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
-    items: {
-  type: [orderItemSchema],
-  required: true,
-  validate: {
-    validator: function (items) {
-      return items.length > 0;
+    // 🏢 SaaS business isolation
+    business: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+      required: true,
+      index: true,
     },
-    message: "Order must contain at least one item",
-  },
-},
+
+    // 📦 Order items
+    items: {
+      type: [orderItemSchema],
+      required: true,
+
+      validate: {
+        validator: function (items) {
+          return items.length > 0;
+        },
+
+        message: "Order must contain at least one item",
+      },
+    },
+
+    // 💰 Total order price
     totalPrice: {
       type: Number,
       required: true,
       min: 0,
     },
 
+    // 🚚 Order lifecycle
     status: {
       type: String,
-      enum: ["pending", "paid", "shipped", "completed", "cancelled"],
-      default: "pending",
+
+      enum: [
+        "pending",
+        "paid",
+        "shipped",
+        "completed",
+        "cancelled",
+        "refunded",
+      ],
+
+      default: "paid",
+
+      index: true,
     },
 
+    // 💳 Payment tracking
     paymentStatus: {
       type: String,
-      enum: ["unpaid", "paid", "failed", "refunded"],
-      default: "unpaid",
+
+      enum: [
+        "unpaid",
+        "paid",
+        "failed",
+        "refunded",
+      ],
+
+      default: "paid",
     },
   },
-  { timestamps: true }
+
+  // 🕒 createdAt + updatedAt
+  {
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model("Order", orderSchema);

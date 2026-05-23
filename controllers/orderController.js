@@ -1,6 +1,8 @@
 const orderService = require("../services/orderService");
 
+// =========================
 // CREATE ORDER
+// =========================
 const createOrder = async (req, res) => {
   try {
     const order = await orderService.createOrder(
@@ -20,7 +22,31 @@ const createOrder = async (req, res) => {
   }
 };
 
+// =========================
+// GET ALL ORDERS
+// =========================
+const getAllOrders = async (req, res) => {
+  try {
+    const result = await orderService.getAllOrders(
+      req.user.business._id,
+      req.query
+    );
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+// =========================
 // GET MY ORDERS
+// =========================
 const getMyOrders = async (req, res) => {
   try {
     const orders = await orderService.getMyOrders(req.user.id);
@@ -37,8 +63,30 @@ const getMyOrders = async (req, res) => {
     });
   }
 };
+// =========================
+// REVENUE SUMMARY
+// =========================
+const getRevenueSummary = async (req, res) => {
+  try {
+    const summary =
+      await orderService.getRevenueSummary(
+        req.user.business._id
+      );
 
+    res.status(200).json({
+      success: true,
+      summary,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 module.exports = {
   createOrder,
+  getAllOrders,
   getMyOrders,
+getRevenueSummary,
 };

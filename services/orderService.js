@@ -1,6 +1,9 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
+// =========================
+// CREATE ORDER
+// =========================
 exports.createOrder = async (items, userId) => {
   if (!items || items.length === 0) {
     throw new Error("Order items required");
@@ -8,6 +11,9 @@ exports.createOrder = async (items, userId) => {
 
   let totalPrice = 0;
   const orderItems = [];
+
+  // 🔥 We’ll use first product business
+  let businessId = null;
 
   for (let item of items) {
     const product = await Product.findOne({
@@ -19,20 +25,28 @@ exports.createOrder = async (items, userId) => {
       throw new Error("Product not found");
     }
 
-const qty = Number(item.quantity);
-if (!qty || qty <= 0) {
-  throw new Error("Invalid quantity");
-}
-// 🔥 IMPORTANT FIX
-
-    if (product.stock < qty) {
-      throw new Error(`${product.name} has only ${product.stock} left`);
+    // 🔥 Save business
+    if (!businessId) {
+      businessId = product.business;
     }
 
-    // 💰 calculate price
+    const qty = Number(item.quantity);
+
+    if (!qty || qty <= 0) {
+      throw new Error("Invalid quantity");
+    }
+
+    // 🔥 STOCK CHECK
+    if (product.stock < qty) {
+      throw new Error(
+        `${product.name} has only ${product.stock} left`
+      );
+    }
+
+    // 💰 CALCULATE TOTAL
     totalPrice += product.price * qty;
 
-    // 📦 build order
+    // 📦 BUILD ORDER ITEM
     orderItems.push({
       product: product._id,
       name: product.name,
@@ -40,20 +54,148 @@ if (!qty || qty <= 0) {
       quantity: qty,
     });
 
-    // 🔥 REDUCE STOCK HERE (SINGLE SOURCE OF TRUTH)
+    // 📉 REDUCE STOCK
     product.stock -= qty;
+
     await product.save();
   }
 
+  // =========================
+  // CREATE ORDER
+  // =========================
   const order = await Order.create({
     user: userId,
+    business: businessId,
     items: orderItems,
     totalPrice,
+    status: "paid",
   });
 
   return order;
 };
 
+// =========================
+// GET MY ORDERS
+// =========================
 exports.getMyOrders = async (userId) => {
-  return await Order.find({ user: userId });
+  return await Order.find({ user: userId })
+    .populate("items.product")
+    .sort({ createdAt: -1 });
+};
+
+// =========================
+// GET ALL ORDERS
+// =========================
+exports.getAllOrders = async (businessId, query) => {
+  let {
+    page = 1,
+    limit = 10,
+    status,
+    startDate,
+    endDate,
+  } = query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  // =========================
+  // FILTER OBJECT
+  // =========================
+  let filter = {
+    business: businessId,
+  };
+
+  // 🔹 STATUS FILTER
+  if (status) {
+    filter.status = status;
+  }
+
+  // 🔹 DATE RANGE FILTER
+  if (startDate || endDate) {
+    filter.createdAt = {};
+
+    if (startDate) {
+      filter.createdAt.$gte = new Date(startDate);
+    }
+
+    if (endDate) {
+      filter.createdAt.$lte = new Date(endDate);
+    }
+  }
+
+  // =========================
+  // QUERY DATABASE
+  // =========================
+  const orders = await Order.find(filter)
+    .populate("items.product")
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  // =========================
+  // TOTAL DOCUMENTS
+  // =========================
+  const total = await Order.countDocuments(filter);
+
+  return {
+    data: orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+// =========================
+// REVENUE SUMMARY
+// =========================
+exports.getRevenueSummary = async (businessId) => {
+  const result = await Order.aggregate([
+    // 🔒 SaaS isolation
+    {
+      $match: {
+        business: businessId,
+        status: {
+          $in: ["paid", "completed"],
+        },
+      },
+    },
+
+    // 📊 Calculate analytics
+    {
+      $group: {
+        _id: null,
+
+        totalRevenue: {
+          $sum: "$totalPrice",
+        },
+
+        totalOrders: {
+          $sum: 1,
+        },
+
+        averageOrderValue: {
+          $avg: "$totalPrice",
+        },
+      },
+    },
+  ]);
+
+  // 🔥 Empty fallback
+  if (result.length === 0) {
+    return {
+      totalRevenue: 0,
+      totalOrders: 0,
+      averageOrderValue: 0,
+    };
+  }
+
+  return {
+    totalRevenue: result[0].totalRevenue,
+    totalOrders: result[0].totalOrders,
+    averageOrderValue: Math.round(
+      result[0].averageOrderValue
+    ),
+  };
 };
