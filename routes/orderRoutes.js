@@ -6,6 +6,7 @@ const {
   getMyOrders,
   getAllOrders,
   getRevenueSummary,
+updateOrderStatus,
 } = require("../controllers/orderController");
 
 const protect = require("../middleware/authMiddleware");
@@ -23,7 +24,14 @@ router.get(
   protect,
   getRevenueSummary
 );
-
+// =========================
+// UPDATE ORDER STATUS
+// =========================
+router.patch(
+  "/:id/status",
+  protect,
+  updateOrderStatus
+);
 module.exports = router;
 
 

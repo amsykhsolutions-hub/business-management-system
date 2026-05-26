@@ -199,3 +199,59 @@ exports.getRevenueSummary = async (businessId) => {
     ),
   };
 };
+// =========================
+// UPDATE ORDER STATUS
+// =========================
+exports.updateOrderStatus = async (
+  orderId,
+  businessId,
+  newStatus
+) => {
+  // 🔍 Find order
+  const order = await Order.findOne({
+    _id: orderId,
+    business: businessId,
+  });
+
+  // ❌ Order not found
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  const currentStatus = order.status;
+
+  // =========================
+  // ALLOWED STATUS CHANGES
+  // =========================
+  const allowedTransitions = {
+    pending: ["paid", "cancelled"],
+
+    paid: ["shipped", "refunded"],
+
+    shipped: ["completed"],
+
+    completed: [],
+
+    cancelled: [],
+
+    refunded: [],
+  };
+
+  // ❌ Invalid transition
+  if (
+    !allowedTransitions[currentStatus].includes(
+      newStatus
+    )
+  ) {
+    throw new Error(
+      `Cannot change status from ${currentStatus} to ${newStatus}`
+    );
+  }
+
+  // ✅ Update status
+  order.status = newStatus;
+
+  await order.save();
+
+  return order;
+};
