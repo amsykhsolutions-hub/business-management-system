@@ -10,6 +10,7 @@ const app = express();
 const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
 
 // middleware
 app.use(cors());
@@ -25,6 +26,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/settings", settingsRoutes);
 // test route
 app.get("/", (req, res) => {
   res.status(200).send("API is running...");

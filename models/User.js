@@ -12,7 +12,13 @@ business: {
     type: String,
     enum: ["admin", "user"],
     default: "user"
+  },
+theme: {
+    type: String,
+    enum: ["light", "dark"],
+    default: "light"
   }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
