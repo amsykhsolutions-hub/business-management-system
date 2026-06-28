@@ -10,8 +10,7 @@ const getProfile = async (req, res) => {
         message: "User not found"
       });
     }
-
-    res.json(user);
+res.json(user);
 
   } catch (err) {
     res.status(500).json({
@@ -19,7 +18,31 @@ const getProfile = async (req, res) => {
     });
   }
 };
+const updateProfile = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name },
+      { new: true }
+    ).select("-password");
+
+    res.json({
+      message: "Profile updated successfully",
+      user
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
+   
 
 module.exports = {
-  getProfile
+  getProfile,
+  updateProfile
 };
+
