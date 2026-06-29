@@ -39,10 +39,30 @@ const updateProfile = async (req, res) => {
     });
   }
 };
-   
 
+const updateTheme = async (req, res) => {
+  try {
+    const { theme } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { theme },
+      { new: true }
+    ).select("-password");
+
+    res.json({
+      message: "Theme updated successfully",
+      user
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
 module.exports = {
   getProfile,
-  updateProfile
-};
+  updateProfile,
+updateTheme};
 
