@@ -5,12 +5,17 @@ const authMiddleware = require("../middleware/authMiddleware");
 const {
   getProfile,
   updateProfile,
-  updateTheme
+  updateTheme,updatePassword
 } = require("../controllers/settingsController");
 router.put(
   "/theme",
   authMiddleware,
   updateTheme
+);
+router.put(
+  "/password",
+  authMiddleware,
+  updatePassword
 );
 router.get("/profile", authMiddleware, getProfile);
 

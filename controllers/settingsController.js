@@ -1,5 +1,5 @@
 const User = require("../models/User");
-
+const settingsService = require("../services/settingsService");
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
@@ -61,8 +61,32 @@ const updateTheme = async (req, res) => {
     });
   }
 };
+const updatePassword = async (req, res) => {
+  try {
+    const {
+      currentPassword,
+      newPassword,
+      confirmPassword
+    } = req.body;
+
+    const result = await settingsService.updatePassword(
+      req.user._id,
+      currentPassword,
+      newPassword,
+      confirmPassword
+    );
+
+    res.json(result);
+
+  } catch (err) {
+    res.status(400).json({
+      message: err.message
+    });
+  }
+};
 module.exports = {
   getProfile,
   updateProfile,
-updateTheme};
+updateTheme,
+updatePassword};
 
